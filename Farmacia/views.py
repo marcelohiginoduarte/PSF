@@ -7,6 +7,7 @@ from datetime import datetime
 from .forms import EstoqueFarmaciaForm, SaidaEstoqueForm
 from django.http import HttpResponseBadRequest
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -14,7 +15,12 @@ def home(request):
 
 def estoque_farmacia_lista(request):
     estoque_itens = EstoqueFarmacia.objects.all()
-    return render(request, 'Farmacia_todos_itens.html', {'estoque_itens':estoque_itens})
+    paginator = Paginator(estoque_itens, 10)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'Farmacia_todos_itens.html', {'page_obj': page_obj})
 
 class EstoqueFarmaciaViewSet(viewsets.ModelViewSet):
     queryset = EstoqueFarmacia.objects.all()
