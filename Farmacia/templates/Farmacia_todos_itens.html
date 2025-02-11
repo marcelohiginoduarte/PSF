@@ -1,0 +1,71 @@
+{% extends 'index.html' %}
+
+{% block conteudo %}
+<style>
+    .styled-table {
+        font-size: 22px;
+    }
+
+    .styled-table th, .styled-table td {
+        padding: 10px;
+    }
+
+    .styled-table tr:hover {
+        background-color: #f2f2f2; 
+        cursor: pointer; 
+    }
+
+    .styled-table .selected {
+        background-color: #d1ffd1; 
+    }
+
+    h2 {
+        font-size: 28px; 
+        margin-bottom: 20px; 
+    }
+</style>
+</style>
+
+<h2>Lista de Itens no Estoque de Farmácia</h2>
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Quantidade</th>
+            <th>Controlado</th>
+            <th>Data de Vencimento</th>
+            <th>Entrada</th>
+            <th>Saida</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in estoque_itens %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.remedio }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>{{ item.controlado }}</td>
+                <td>{{ item.observacao }}</td>
+                <td><a href="#">Entrada</a></td>
+                <td><a href="#">Saida</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.styled-table tbody tr');
+        
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                rows.forEach(row => row.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+    });
+</script>
+
+{% endblock %}
