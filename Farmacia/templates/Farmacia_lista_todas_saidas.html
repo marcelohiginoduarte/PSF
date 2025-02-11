@@ -1,0 +1,30 @@
+{% extends 'index.html' %}
+
+{% block conteudo %}
+<h2>Saídas de Estoque do Mês Atual</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Item</th>
+            <th>Quantidade</th>
+            <th>Data de Saída</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for saida in saidas_estoque %}
+        <tr>
+            <td>{{ saida.id }}</td>
+            <td>{{ saida.item.nome }}</td>
+            <td>{{ saida.quantidade }}</td>
+            <td>{{ saida.data_saida|date:"d/m/Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Nenhuma saída registrada este mês.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
