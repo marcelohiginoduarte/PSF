@@ -1,9 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from rest_framework import viewsets
 from .models import EstoqueFarmacia, SaidaEstoque
 from .serializer import EstoqueFarmaciaSerializer, SaidaEstoqueSerializer
 from datetime import datetime
-from .forms import EstoqueFarmaciaForm
+from .forms import EstoqueFarmaciaForm, SaidaEstoqueForm
+from django.http import HttpResponseBadRequest
+from django.utils import timezone
 
 
 def home(request):
@@ -54,7 +57,43 @@ class SaidaEstoqueViewSet(viewsets.ModelViewSet):
         estoque_item.save()
         
         return response
-    
+
+def saida_estoque(request, item_id):
+    item = get_object_or_404(EstoqueFarmacia, id=item_id)
+
+    if request.method == "POST":
+        try:
+            quantidade_saida = int(request.POST.get("quantidade", 0))
+            quantidade_disponivel = int(item.quantidade)
+        except ValueError:
+            return HttpResponseBadRequest("Quantidade inválida")
+
+        if quantidade_saida > quantidade_disponivel:
+            return HttpResponseBadRequest("Erro: Quantidade de saída maior que a disponível!")
+
+        SaidaEstoque.objects.create(
+            item=item,
+            quantidade=quantidade_saida,
+            responsavel_recebimento=request.POST.get("responsavel_recebimento"),
+            responsacel_entrega=request.POST.get("responsacel_entrega"),
+            cpf=request.POST.get("cpf"),
+            sus=request.POST.get("sus"),
+            motivo=request.POST.get("motivo"),
+            data_saida=timezone.now(),  
+        )
+
+        item.quantidade = quantidade_disponivel - quantidade_saida
+        item.save()
+
+        messages.success(request, f"Saída de {quantidade_saida} unidades registrada!")
+        return redirect("estoque farmacia")  
+
+    else:
+        form = SaidaEstoqueForm()
+
+    return render(request, "Farmacia_modal_saida.html", {"form": form, "item": item})
+
+
 
 def saidas_estoque_lista(request):
     mes = int(request.GET.get('mes', datetime.now().month))

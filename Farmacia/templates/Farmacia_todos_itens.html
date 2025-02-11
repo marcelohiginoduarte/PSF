@@ -3,7 +3,7 @@
 {% block conteudo %}
 <style>
     .styled-table {
-        font-size: 22px;
+        font-size: 16px;
     }
 
     .styled-table th, .styled-table td {
@@ -11,19 +11,44 @@
     }
 
     .styled-table tr:hover {
-        background-color: #f2f2f2; 
-        cursor: pointer; 
+        background-color: #f2f2f2;
+        cursor: pointer;
     }
 
     .styled-table .selected {
-        background-color: #d1ffd1; 
+        background-color: #d1ffd1;
     }
 
     h2 {
-        font-size: 28px; 
-        margin-bottom: 20px; 
+        font-size: 28px;
+        margin-bottom: 20px;
     }
-</style>
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        margin: 10% auto;
+        width: 40%;
+        border-radius: 10px;
+    }
+
+    .close {
+        float: right;
+        font-size: 28px;
+        cursor: pointer;
+    }
 </style>
 
 <h2>Lista de Itens no Estoque de Farmácia</h2>
@@ -37,7 +62,7 @@
             <th>Local</th>
             <th>Observação</th>
             <th>Entrada</th>
-            <th>Saida</th>
+            <th>Saída</th>
         </tr>
     </thead>
     <tbody>
@@ -47,27 +72,60 @@
                 <td>{{ item.remedio }}</td>
                 <td>{{ item.quantidade }}</td>
                 <td>{% if item.controlado %}Sim{% else %}Não{% endif %}</td>
-                <th>{{ item.local }}</th>
+                <td>{{ item.local }}</td>
                 <td>{{ item.observacao }}</td>
                 <td><a href="#">Entrada</a></td>
-                <td><a href="#">Saída</a></td>
+                <td>
+                    <button onclick="abrirModal({{ item.id }}, '{{ item.remedio }}')">Saída</button>
+                </td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
 
+<!-- Modal de Saída -->
+<div id="modalSaida" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h2>Registrar Saída - <span id="remedioNome"></span></h2>
+        <form id="saidaForm" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="item_id" id="item_id">
+            
+            <label for="quantidade">Quantidade:</label>
+            <input type="number" name="quantidade" id="quantidade" class="form-control" required>
+
+            <label for="responsavel_recebimento">Responsável Recebimento:</label>
+            <input type="text" name="responsavel_recebimento" class="form-control" required>
+
+            <label for="responsacel_entrega">Responsável Entrega:</label>
+            <input type="text" name="responsacel_entrega" class="form-control" required>
+
+            <label for="cpf">CPF:</label>
+            <input type="text" name="cpf" class="form-control" required>
+
+            <label for="sus">SUS:</label>
+            <input type="text" name="sus" class="form-control" required>
+
+            <label for="motivo">Motivo:</label>
+            <textarea name="motivo" class="form-control"></textarea>
+
+            <button type="submit">Salvar Saída</button>
+        </form>
+    </div>
+</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('.styled-table tbody tr');
-        
-        rows.forEach(row => {
-            row.addEventListener('click', function() {
-                rows.forEach(row => row.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
-    });
+    function abrirModal(itemId, remedioNome) {
+        document.getElementById("modalSaida").style.display = "block";
+        document.getElementById("item_id").value = itemId;
+        document.getElementById("remedioNome").innerText = remedioNome;
+        document.getElementById("saidaForm").action = "/saida_estoque/" + itemId + "/";
+    }
+
+    function fecharModal() {
+        document.getElementById("modalSaida").style.display = "none";
+    }
 </script>
 
 {% endblock %}

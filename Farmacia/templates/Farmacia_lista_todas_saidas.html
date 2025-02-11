@@ -1,6 +1,29 @@
 {% extends 'index.html' %}
 
 {% block conteudo %}
+<style>
+    .styled-table {
+        font-size: 22px;
+    }
+
+    .styled-table th, .styled-table td {
+        padding: 10px;
+    }
+
+    .styled-table tr:hover {
+        background-color: #f2f2f2; 
+        cursor: pointer; 
+    }
+
+    .styled-table .selected {
+        background-color: #d1ffd1; 
+    }
+
+    h2 {
+        font-size: 28px; 
+        margin-bottom: 20px; 
+    }
+</style>
 <h2>Saídas de Estoque do Mês Atual</h2>
 
 <form method="GET" action="">
@@ -20,11 +43,13 @@
 </form>
 
 
-<table>
+<table class="styled-table">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Item</th>
+            <th>Remedio</th>
+            <th>Responsavel Recebimento</th>
+            <th>Responsavel Entrega</th>
             <th>Quantidade</th>
             <th>Data de Saída</th>
         </tr>
@@ -34,8 +59,8 @@
         <tr>
             <td>{{ saida.id }}</td>
             <td>{{ saida.item.remedio }}</td>
-            <td>{{ saida.item.responsavel_recebimento }}</td>
-            <td>{{ saida.item.responsacel_entrega }}</td>
+            <td>{{ saida.responsavel_recebimento }}</td>
+            <td>{{ saida.responsacel_entrega }}</td>
             <td>{{ saida.quantidade }}</td>
             <td>{{ saida.data_saida|date:"d/m/Y" }}</td>
         </tr>

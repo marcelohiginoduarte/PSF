@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from Farmacia.views import EstoqueFarmaciaViewSet, home, estoque_farmacia_lista, SaidaEstoqueViewSet, saidas_estoque_lista, cadastrar_estoque
+from Farmacia.views import EstoqueFarmaciaViewSet, home, estoque_farmacia_lista, SaidaEstoqueViewSet, saidas_estoque_lista, cadastrar_estoque, saida_estoque
 
 
 router = DefaultRouter()
@@ -15,6 +15,7 @@ urlpatterns = [
     path('Farmacia/estoque', estoque_farmacia_lista, name='estoque farmacia'),
     path('Farmacia/listar_saidas', saidas_estoque_lista, name='lista de todas as saidas do mes'),
     path('Farmacia/cadastrar', cadastrar_estoque, name='cadastrar_estoque'),
+    path('saida_estoque/<int:item_id>/', saida_estoque, name='saida_estoque'),
     path('', include(router.urls)),
     path('api/', include(router.urls)),
 ]
