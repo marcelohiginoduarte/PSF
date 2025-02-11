@@ -3,6 +3,23 @@
 {% block conteudo %}
 <h2>Saídas de Estoque do Mês Atual</h2>
 
+<form method="GET" action="">
+    <label for="mes">Mês:</label>
+    <select name="mes" id="mes">
+        {% for numero, nome in meses.items %}
+            <option value="{{ numero }}" {% if numero == mes %}selected{% endif %}>
+                {{ nome }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label for="ano">Ano:</label>
+    <input type="number" name="ano" id="ano" value="{{ ano }}" min="2000" max="2100">
+
+    <button type="submit">Filtrar</button>
+</form>
+
+
 <table>
     <thead>
         <tr>
@@ -16,7 +33,9 @@
         {% for saida in saidas_estoque %}
         <tr>
             <td>{{ saida.id }}</td>
-            <td>{{ saida.item.nome }}</td>
+            <td>{{ saida.item.remedio }}</td>
+            <td>{{ saida.item.responsavel_recebimento }}</td>
+            <td>{{ saida.item.responsacel_entrega }}</td>
             <td>{{ saida.quantidade }}</td>
             <td>{{ saida.data_saida|date:"d/m/Y" }}</td>
         </tr>

@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<title>Ready Bootstrap Dashboard</title>
+	<title>Gestão PSF</title>
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
 	<link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
@@ -109,12 +109,19 @@
 								<span class="badge badge-count">5</span>
 							</a>
 						</li>
-						<li class="nav-item">
-							<a href="{% url 'estoque farmacia' %}">
-								<i class="la la-table"></i>
-								<p>Farmacia</p>
-								<span class="badge badge-count">14</span>
+						<li class="nav-item dropdown hidden-caret">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<i class="la la-envelope">Farmacia</i>
 							</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+								<a class="dropdown-item" href="{% url 'estoque farmacia' %}">Estoque</a>
+								<a class="dropdown-item" href="{% url 'cadastrar_estoque' %}">Entradas</a>
+								<a class="dropdown-item" href="{% url 'lista de todas as saidas do mes' %}">Saídas</a>
+								<div class="dropdown-divider"></div>
+							</div>
+						</li>
+						<li class="nav-item">
+							>
 						</li>
 						<li class="nav-item">
 							<a href="forms.html">
