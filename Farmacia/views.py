@@ -13,6 +13,7 @@ from django.core.paginator import Paginator
 def home(request):
     return render(request, 'index.html')
 
+
 def estoque_farmacia_lista(request):
     estoque_itens = EstoqueFarmacia.objects.all()
     paginator = Paginator(estoque_itens, 10)
@@ -21,6 +22,7 @@ def estoque_farmacia_lista(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'Farmacia_todos_itens.html', {'page_obj': page_obj})
+
 
 class EstoqueFarmaciaViewSet(viewsets.ModelViewSet):
     queryset = EstoqueFarmacia.objects.all()
@@ -64,6 +66,7 @@ class SaidaEstoqueViewSet(viewsets.ModelViewSet):
         
         return response
 
+
 def saida_estoque(request, item_id):
     item = get_object_or_404(EstoqueFarmacia, id=item_id)
 
@@ -98,7 +101,6 @@ def saida_estoque(request, item_id):
         form = SaidaEstoqueForm()
 
     return render(request, "Farmacia_modal_saida.html", {"form": form, "item": item})
-
 
 
 def saidas_estoque_lista(request):
