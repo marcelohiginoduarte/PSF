@@ -1,5 +1,5 @@
 from django import forms
-from .models import EstoqueFarmacia, SaidaEstoque
+from .models import EstoqueFarmacia, SaidaEstoque, SaidaRemediosRecitas
 
 class EstoqueFarmaciaForm(forms.ModelForm):
     class Meta:
@@ -19,3 +19,11 @@ class SaidaEstoqueForm(forms.ModelForm):
             'sus': forms.TextInput(attrs={'class': 'form-control'}),
             'motivo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
+
+class SaidaRemediosRecitasForm(forms.ModelForm):
+    class Meta:
+        model = SaidaRemediosRecitas
+        fields = ['medico_da_receita', 'data_receita', 'responsacel_entrega', 'quantidade']
+
+    data_receita = forms.DateField(widget=forms.SelectDateWidget(years=range(2000, 2100)))

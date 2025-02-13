@@ -31,3 +31,12 @@ class SaidaEstoque(models.Model):
 
     class Meta:
         ordering = ['-data_saida']
+
+
+class SaidaRemediosRecitas(models.Model):
+    item = models.ForeignKey(EstoqueFarmacia, on_delete=models.CASCADE)
+    medico_da_receita = models.CharField(max_length=150, null=True, blank=True)
+    data_receita = models.DateField()
+    responsacel_entrega = models.CharField(max_length=150, null=True, blank=True)
+    quantidade = models.IntegerField()
+    data_saida = models.DateField()

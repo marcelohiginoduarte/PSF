@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from rest_framework import viewsets
-from .models import EstoqueFarmacia, SaidaEstoque
+from .models import EstoqueFarmacia, SaidaEstoque, SaidaRemediosRecitas
 from .serializer import EstoqueFarmaciaSerializer, SaidaEstoqueSerializer
 from datetime import datetime
-from .forms import EstoqueFarmaciaForm, SaidaEstoqueForm
+from .forms import EstoqueFarmaciaForm, SaidaEstoqueForm,SaidaRemediosRecitasForm
 from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django.core.paginator import Paginator
@@ -80,7 +80,14 @@ def saida_estoque(request, item_id):
         if quantidade_saida > quantidade_disponivel:
             return HttpResponseBadRequest("Erro: Quantidade de saída maior que a disponível!")
 
-        SaidaEstoque.objects.create(
+        if item.controlado:
+            medico_da_receita = request.POST.get("medico_da_receita")
+            data_receita = request.POST.get("data_receita")
+
+            if not medico_da_receita or not data_receita:
+                return HttpResponseBadRequest("Erro: Medicamentos controlados exigem médico e data da receita!")
+
+        saida = SaidaEstoque.objects.create(
             item=item,
             quantidade=quantidade_saida,
             responsavel_recebimento=request.POST.get("responsavel_recebimento"),
@@ -90,6 +97,16 @@ def saida_estoque(request, item_id):
             motivo=request.POST.get("motivo"),
             data_saida=timezone.now(),  
         )
+
+        if item.controlado:
+            SaidaRemediosRecitas.objects.create(
+                item=item,
+                medico_da_receita=request.POST.get("medico_da_receita"),
+                data_receita=request.POST.get("data_receita"),
+                responsacel_entrega=request.POST.get("responsacel_entrega"),
+                quantidade=quantidade_saida,
+                data_saida=timezone.now(),
+            )
 
         item.quantidade = quantidade_disponivel - quantidade_saida
         item.save()
@@ -101,6 +118,7 @@ def saida_estoque(request, item_id):
         form = SaidaEstoqueForm()
 
     return render(request, "Farmacia_modal_saida.html", {"form": form, "item": item})
+
 
 
 def saidas_estoque_lista(request):
@@ -121,3 +139,34 @@ def saidas_estoque_lista(request):
         'ano': ano,
         'meses': meses
     })
+
+def salvar_saida_receita(request, item_id):
+    item = get_object_or_404(EstoqueFarmacia, id=item_id)
+
+    if item.controlado and request.method == 'POST':
+        form = SaidaRemediosRecitasForm(request.POST)
+        
+        if form.is_valid():
+            medico_da_receita = form.cleaned_data['medico_da_receita']
+            data_receita = form.cleaned_data['data_receita']
+            responsacel_entrega = form.cleaned_data['responsacel_entrega']
+            quantidade = form.cleaned_data['quantidade']
+
+            SaidaRemediosRecitas.objects.create(
+                item=item,
+                medico_da_receita=medico_da_receita,
+                data_receita=data_receita,
+                responsacel_entrega=responsacel_entrega,
+                quantidade=quantidade,
+                data_saida=timezone.now(),
+            )
+
+            item.quantidade -= quantidade
+            item.save()
+
+            return redirect("estoque_farmacia")
+
+        else:
+            return HttpResponseBadRequest("Formulário inválido")
+    
+    return render(request, 'modal_receita.html', {'item': item, 'form': form})
