@@ -80,18 +80,15 @@ def saida_estoque(request, item_id):
         if quantidade_saida > quantidade_disponivel:
             return HttpResponseBadRequest("Erro: Quantidade de saída maior que a disponível!")
 
-        if item.controlado:
-            medico_da_receita = request.POST.get("medico_da_receita")
-            data_receita = request.POST.get("data_receita")
-
-            if not medico_da_receita or not data_receita:
-                return HttpResponseBadRequest("Erro: Medicamentos controlados exigem médico e data da receita!")
+        responsavel_entrega = request.POST.get("responsavel_entrega")
+        if not responsavel_entrega:
+            return HttpResponseBadRequest("Erro: O responsável pela entrega é obrigatório!")
 
         saida = SaidaEstoque.objects.create(
             item=item,
             quantidade=quantidade_saida,
             responsavel_recebimento=request.POST.get("responsavel_recebimento"),
-            responsacel_entrega=request.POST.get("responsacel_entrega"),
+            responsavel_entrega=responsavel_entrega,
             cpf=request.POST.get("cpf"),
             sus=request.POST.get("sus"),
             motivo=request.POST.get("motivo"),
@@ -99,11 +96,17 @@ def saida_estoque(request, item_id):
         )
 
         if item.controlado:
+            medico_da_receita = request.POST.get("medico_da_receita")
+            data_receita = request.POST.get("data_receita")
+
+            if not medico_da_receita or not data_receita:
+                return HttpResponseBadRequest("Erro: Medicamentos controlados exigem médico e data da receita!")
+
             SaidaRemediosRecitas.objects.create(
                 item=item,
-                medico_da_receita=request.POST.get("medico_da_receita"),
-                data_receita=request.POST.get("data_receita"),
-                responsacel_entrega=request.POST.get("responsacel_entrega"),
+                medico_da_receita=medico_da_receita,
+                data_receita=data_receita,
+                responsavel_entrega=responsavel_entrega,
                 quantidade=quantidade_saida,
                 data_saida=timezone.now(),
             )
@@ -112,12 +115,13 @@ def saida_estoque(request, item_id):
         item.save()
 
         messages.success(request, f"Saída de {quantidade_saida} unidades registrada!")
-        return redirect("estoque farmacia")  
+        return redirect("estoque_farmacia")  
 
     else:
         form = SaidaEstoqueForm()
 
     return render(request, "Farmacia_modal_saida.html", {"form": form, "item": item})
+
 
 
 

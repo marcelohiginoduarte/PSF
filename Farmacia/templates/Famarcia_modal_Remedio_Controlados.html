@@ -1,0 +1,12 @@
+<div id="modalReceita{{ item.id }}" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h2>Saída de Receita</h2>
+        <form method="POST" action="/salvar_saida_receita/{{ item.id }}/">
+            {% csrf_token %}
+            <label for="motivo">Motivo:</label>
+            <input type="text" name="motivo" required>
+            <button type="submit">Confirmar Saída</button>
+        </form>
+    </div>
+</div>

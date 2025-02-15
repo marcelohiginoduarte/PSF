@@ -121,8 +121,11 @@
                 <td>{{ item.observacao }}</td>
                 <td><a href="#">Entrada</a></td>
                 <td>
-                    <button onclick="abrirModal({{ item.id }}, '{{ item.remedio }}')">Saída</button>
+                    <button type="button" class="btn btn-primary" onclick="abrirModalSaida({{ item.id }}, '{{ item.remedioNome }}', {{ item.controlado|lower }})">
+                        Saída
+                    </button>                    
                 </td>
+                
             </tr>
         {% endfor %}
     </tbody>
@@ -199,24 +202,48 @@
 </div>
 
 <script>
-    function abrirModal(itemId, remedioNome) {
-        let modal = document.getElementById("modalSaida");
-        modal.style.display = "flex"; 
-        document.getElementById("item_id").value = itemId;
-        document.getElementById("remedioNome").innerText = remedioNome;
-        document.getElementById("saidaForm").action = "/Farmacia/saida_estoque/" + itemId + "/";
+    function abrirModalSaida(itemId, remedioNome, controlado) {
+    document.getElementById("item_id").value = itemId;
+    document.getElementById("remedioNome").innerText = remedioNome;
+
+    let modalSaida = new bootstrap.Modal(document.getElementById("modalSaida"));
+    modalSaida.show();
+
+    // Salva se o medicamento é controlado para abrir o próximo modal depois
+    document.getElementById("modalSaida").setAttribute("data-controlado", controlado);
+}
+
+function confirmarSaida() {
+    let modalSaidaEl = document.getElementById("modalSaida");
+    let controlado = modalSaidaEl.getAttribute("data-controlado") === "true";
+
+    // Fecha o modal de saída
+    let modalSaida = bootstrap.Modal.getInstance(modalSaidaEl);
+    modalSaida.hide();
+
+    // Se for controlado, abre o modal de receita
+    if (controlado) {
+        let modalReceita = new bootstrap.Modal(document.getElementById("modalReceita"));
+        modalReceita.show();
+    } else {
+        alert("Saída confirmada!");
+    }
+}
+
+function enviarReceita() {
+    let receitaArquivo = document.getElementById("receitaArquivo").files[0];
+
+    if (!receitaArquivo) {
+        alert("Por favor, envie a receita.");
+        return;
     }
 
-    function fecharModal() {
-        document.getElementById("modalSaida").style.display = "none";
-    }
+    alert("Receita enviada com sucesso!");
+    let modalReceita = bootstrap.Modal.getInstance(document.getElementById("modalReceita"));
+    modalReceita.hide();
+}
 
-    window.onclick = function(event) {
-        let modal = document.getElementById("modalSaida");
-        if (event.target === modal) {
-            fecharModal();
-        }
-    };
+
 </script>
 
 {% endblock %}
