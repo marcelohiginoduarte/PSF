@@ -68,6 +68,7 @@ class SaidaEstoqueViewSet(viewsets.ModelViewSet):
 
 
 def saida_estoque(request, item_id):
+    print(f"Recebido item_id: {item_id}")
     item = get_object_or_404(EstoqueFarmacia, id=item_id)
 
     if request.method == "POST":
@@ -92,7 +93,7 @@ def saida_estoque(request, item_id):
             cpf=request.POST.get("cpf"),
             sus=request.POST.get("sus"),
             motivo=request.POST.get("motivo"),
-            data_saida=timezone.now(),  
+            data_saida=timezone.now(),
         )
 
         if item.controlado:
@@ -115,7 +116,7 @@ def saida_estoque(request, item_id):
         item.save()
 
         messages.success(request, f"Saída de {quantidade_saida} unidades registrada!")
-        return redirect("estoque_farmacia")  
+        return redirect("estoque farmacia")  
 
     else:
         form = SaidaEstoqueForm()

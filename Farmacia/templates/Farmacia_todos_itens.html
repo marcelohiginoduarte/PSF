@@ -5,26 +5,20 @@
     .styled-table {
         font-size: 16px;
     }
-
     .styled-table th, .styled-table td {
         padding: 10px;
     }
-
     .styled-table tr:hover {
         background-color: #f2f2f2;
         cursor: pointer;
     }
-
     .styled-table .selected {
         background-color: #d1ffd1;
     }
-
     h2 {
         font-size: 28px;
         margin-bottom: 20px;
     }
-
-    /* Modal */
     .modal {
         display: none;
         align-items: center;
@@ -38,7 +32,6 @@
         background-color: rgba(0, 0, 0, 0.4);
         overflow-y: auto;
     }
-
     .modal-content {
         background-color: #fff;
         padding: 20px;
@@ -48,54 +41,15 @@
         max-height: 80vh; 
         overflow-y: auto;
     }
-
     .close {
         float: right;
         font-size: 28px;
         cursor: pointer;
     }
-    .pagination {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .pagination a, .pagination span {
-        display: inline-block;
-        padding: 8px 12px;
-        margin: 0 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        text-decoration: none;
-        color: #333;
-    }
-
-    .pagination a:hover {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .pagination span {
-        font-weight: bold;
-    }
-
 </style>
 
 <h2>Lista de Itens no Estoque de Farmácia.</h2>
 <samp>Medicamentos que estão disponíveis.</samp>
-<br>
-<div class="pagination">
-    {% if page_obj.has_previous %}
-        <a href="?page=1"> Primeira </a>
-        <a href="?page={{ page_obj.previous_page_number }}">Anterior </a>
-    {% endif %}
-
-    <span> Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}"> Próxima </a>
-        <a href="?page={{ page_obj.paginator.num_pages }}"> Última </a>
-    {% endif %}
-</div>
 <br>
 <table class="styled-table">
     <thead>
@@ -112,139 +66,94 @@
     </thead>
     <tbody>
         {% for item in page_obj %}
-            <tr>
-                <td>{{ item.id }}</td>
-                <td>{{ item.remedio }}</td>
-                <td>{{ item.quantidade }}</td>
-                <td>{% if item.controlado %}Sim{% else %}Não{% endif %}</td>
-                <td>{{ item.get_local_display }}</td>
-                <td>{{ item.observacao }}</td>
-                <td><a href="#">Entrada</a></td>
-                <td>
-                    <button type="button" class="btn btn-primary" onclick="abrirModalSaida({{ item.id }}, '{{ item.remedioNome }}', {{ item.controlado|lower }})">
-                        Saída
-                    </button>                    
-                </td>
-                
-            </tr>
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.remedio }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>{% if item.controlado %}Sim{% else %}Não{% endif %}</td>
+            <td>{{ item.get_local_display }}</td>
+            <td>{{ item.observacao }}</td>
+            <td><a href="#">Entrada</a></td>
+            <td>
+                <button onclick="abrirModalSaida({{ item.id }}, '{{ item.remedio }}', {{ item.controlado|yesno:'true,false' }})">
+                    Saída
+                </button>
+            </td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<!-- Modal de Receita - Exibe apenas para itens controlados -->
-{% for item in page_obj %}
-    {% if item.controlado %}
-        <div class="modal fade" id="modalReceita{{ item.id }}" tabindex="-1" aria-labelledby="modalReceitaLabel{{ item.id }}" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalReceitaLabel{{ item.id }}">Informações da Receita</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" action="{% url 'salvar_saida_receita' item.id %}">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label for="medico_da_receita" class="form-label">Médico da Receita</label>
-                                <input type="text" class="form-control" id="medico_da_receita" name="medico_da_receita" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="data_receita" class="form-label">Data da Receita</label>
-                                <input type="date" class="form-control" id="data_receita" name="data_receita" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="responsacel_entrega" class="form-label">Responsável pela Entrega</label>
-                                <input type="text" class="form-control" id="responsacel_entrega" name="responsacel_entrega" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="quantidade" class="form-label">Quantidade</label>
-                                <input type="number" class="form-control" id="quantidade" name="quantidade" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Registrar Saída</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endfor %}
-
-<!-- Modal de Saída - Sempre aparece quando clicado -->
+<!-- Modal Saída Normal -->
 <div id="modalSaida" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="fecharModal()">&times;</span>
+        <span class="close" onclick="fecharModal('modalSaida')">&times;</span>
         <h2>Registrar Saída - <span id="remedioNome"></span></h2>
-        <form id="saidaForm" method="POST">
+        <form id="saidaForm" method="POST" action="">
             {% csrf_token %}
             <input type="hidden" name="item_id" id="item_id">
-            
-            <label for="quantidade">Quantidade:</label>
-            <input type="number" name="quantidade" id="quantidade" class="form-control" required>
-
-            <label for="responsavel_recebimento">Responsável Recebimento:</label>
+            <label>Quantidade:</label>
+            <input type="number" name="quantidade" class="form-control" required>
+            <label>Responsável Recebimento:</label>
             <input type="text" name="responsavel_recebimento" class="form-control" required>
-
-            <label for="responsacel_entrega">Responsável Entrega:</label>
-            <input type="text" name="responsacel_entrega" class="form-control" required>
-
-            <label for="cpf">CPF:</label>
+            <label>Responsável Entrega:</label>
+            <input type="text" name="responsavel_entrega" class="form-control" required>
+            <label>CPF:</label>
             <input type="text" name="cpf" class="form-control" required>
-
-            <label for="sus">SUS:</label>
+            <label>SUS:</label>
             <input type="text" name="sus" class="form-control" required>
-
-            <label for="motivo">Motivo:</label>
+            <label>Motivo:</label>
             <textarea name="motivo" class="form-control"></textarea>
-
+            <br>
             <button type="submit">Salvar Saída</button>
         </form>
     </div>
 </div>
 
+<!-- Modal Receita (Controlado) -->
+{% for item in page_obj %}
+{% if item.controlado %}
+<div id="modalReceita{{ item.id }}" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="fecharModal('modalReceita{{ item.id }}')">&times;</span>
+        <h2>Saída Controlada - {{ item.remedio }}</h2>
+        <form method="POST" action="{% url 'salvar_saida_receita' item.id %}">
+            {% csrf_token %}
+            <label>Médico da Receita:</label>
+            <input type="text" name="medico_da_receita" class="form-control" required>
+            <label>Data da Receita:</label>
+            <input type="date" name="data_receita" class="form-control" required>
+            <label>Responsável Entrega:</label>
+            <input type="text" name="responsavel_entrega" class="form-control" required>
+            <label>Quantidade:</label>
+            <input type="number" name="quantidade" class="form-control" required>
+            <br>
+            <button type="submit">Registrar Saída Controlada</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
 <script>
-    function abrirModalSaida(itemId, remedioNome, controlado) {
-    document.getElementById("item_id").value = itemId;
-    document.getElementById("remedioNome").innerText = remedioNome;
-
-    let modalSaida = new bootstrap.Modal(document.getElementById("modalSaida"));
-    modalSaida.show();
-
-    // Salva se o medicamento é controlado para abrir o próximo modal depois
-    document.getElementById("modalSaida").setAttribute("data-controlado", controlado);
-}
-
-function confirmarSaida() {
-    let modalSaidaEl = document.getElementById("modalSaida");
-    let controlado = modalSaidaEl.getAttribute("data-controlado") === "true";
-
-    // Fecha o modal de saída
-    let modalSaida = bootstrap.Modal.getInstance(modalSaidaEl);
-    modalSaida.hide();
-
-    // Se for controlado, abre o modal de receita
+function abrirModalSaida(itemId, remedioNome, controlado) {
     if (controlado) {
-        let modalReceita = new bootstrap.Modal(document.getElementById("modalReceita"));
-        modalReceita.show();
+        const modalId = "modalReceita" + itemId;
+        document.getElementById(modalId).style.display = "flex";
     } else {
-        alert("Saída confirmada!");
+        document.getElementById("remedioNome").innerText = remedioNome;
+        document.getElementById("item_id").value = itemId;
+        document.getElementById("saidaForm").action = `/Farmacia/saida_estoque/${itemId}/`;
+        document.getElementById("modalSaida").style.display = "flex";
     }
 }
 
-function enviarReceita() {
-    let receitaArquivo = document.getElementById("receitaArquivo").files[0];
-
-    if (!receitaArquivo) {
-        alert("Por favor, envie a receita.");
-        return;
-    }
-
-    alert("Receita enviada com sucesso!");
-    let modalReceita = bootstrap.Modal.getInstance(document.getElementById("modalReceita"));
-    modalReceita.hide();
+function fecharModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
 }
-
-
 </script>
-
 {% endblock %}
+
+
+
 
