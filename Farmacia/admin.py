@@ -9,7 +9,7 @@ admin.site.register(EstoqueFarmacia, EstoqueAdmin)
 
 
 class SaidaAdmin(admin.ModelAdmin):
-    list_display = ['cpf', 'quantidade', ]
+    list_display = ['id','cpf', 'quantidade', ]
     list_display_links = ['cpf', 'quantidade']
 
 admin.site.register(SaidaEstoque, SaidaAdmin)

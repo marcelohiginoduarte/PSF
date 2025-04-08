@@ -19,7 +19,7 @@ class EstoqueFarmacia(models.Model):
 class SaidaEstoque(models.Model):
     item = models.ForeignKey(EstoqueFarmacia, on_delete=models.CASCADE)
     responsavel_recebimento = models.CharField(max_length=150, null=True, blank=True)
-    responsacel_entrega = models.CharField(max_length=150, null=True, blank=True)
+    responsavel_entrega = models.CharField(max_length=150, null=True, blank=True)
     quantidade = models.IntegerField()
     data_saida = models.DateField()
     cpf = models.CharField(max_length=15, blank=False, null=False)
@@ -37,6 +37,6 @@ class SaidaRemediosRecitas(models.Model):
     item = models.ForeignKey(EstoqueFarmacia, on_delete=models.CASCADE)
     medico_da_receita = models.CharField(max_length=150, null=True, blank=True)
     data_receita = models.DateField()
-    responsacel_entrega = models.CharField(max_length=150, null=True, blank=True)
+    responsavel_entrega = models.CharField(max_length=150, null=True, blank=True)
     quantidade = models.IntegerField()
     data_saida = models.DateField()
