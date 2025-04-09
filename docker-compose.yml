@@ -16,7 +16,7 @@ services:
 
   web:
     image: django:latest
-    container_name: django_web
+    container_name: psf
     build:
       context: .
       dockerfile: Dockerfile

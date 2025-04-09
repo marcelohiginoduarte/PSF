@@ -52,6 +52,7 @@
 <samp>Medicamentos que estão disponíveis.</samp>
 <br>
 <table class="styled-table">
+    <br>
     <thead>
         <tr>
             <th>ID</th>
@@ -75,7 +76,7 @@
             <td>{{ item.observacao }}</td>
             <td><a href="#">Entrada</a></td>
             <td>
-                <button onclick="abrirModalSaida({{ item.id }}, '{{ item.remedio }}', {{ item.controlado|yesno:'true,false' }})">
+                <button onclick="abrirModalSaida({{ item.id }}, '{{ item.remedio }}', {{ item.quantidade }}, {{ item.controlado|yesno:'true,false' }})">
                     Saída
                 </button>
             </td>
@@ -89,6 +90,7 @@
     <div class="modal-content">
         <span class="close" onclick="fecharModal('modalSaida')">&times;</span>
         <h2>Registrar Saída - <span id="remedioNome"></span></h2>
+        <h5>Quantidade no estoque: <samp id="quantidadesRemedio"></samp></h5>
         <form id="saidaForm" method="POST" action="">
             {% csrf_token %}
             <input type="hidden" name="item_id" id="item_id">
@@ -136,12 +138,13 @@
 {% endfor %}
 
 <script>
-function abrirModalSaida(itemId, remedioNome, controlado) {
+function abrirModalSaida(itemId, remedioNome, quantidadesRemedio, controlado) {
     if (controlado) {
         const modalId = "modalReceita" + itemId;
         document.getElementById(modalId).style.display = "flex";
     } else {
         document.getElementById("remedioNome").innerText = remedioNome;
+        document.getElementById("quantidadesRemedio").innerText = quantidadesRemedio;
         document.getElementById("item_id").value = itemId;
         document.getElementById("saidaForm").action = `/Farmacia/saida_estoque/${itemId}/`;
         document.getElementById("modalSaida").style.display = "flex";
