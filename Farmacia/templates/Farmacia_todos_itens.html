@@ -4,9 +4,12 @@
 <style>
     .styled-table {
         font-size: 16px;
+        width: 100%;
+        border-collapse: collapse;
     }
     .styled-table th, .styled-table td {
         padding: 10px;
+        text-align: left;
     }
     .styled-table tr:hover {
         background-color: #f2f2f2;
@@ -46,16 +49,40 @@
         font-size: 28px;
         cursor: pointer;
     }
+
+    /* Estilização da paginação */
+    .pagination {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .pagination a {
+        margin: 0 5px;
+        padding: 5px 10px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .pagination .current {
+        margin: 0 5px;
+        padding: 5px 10px;
+        font-weight: bold;
+    }
+
+    /* Negrito para a coluna de nome */
+    .styled-table td:first-child {
+        font-weight: bold;
+    }
 </style>
 
 <h2>Lista de Itens no Estoque de Farmácia.</h2>
+<input type="text" id="pesquisa" placeholder="Pesquisar item..." class="form-control" style="margin-bottom: 15px; width: 300px;">
 <samp>Medicamentos que estão disponíveis.</samp>
 <br>
 <table class="styled-table">
     <br>
     <thead>
         <tr>
-            <th>ID</th>
             <th>Nome</th>
             <th>Quantidade</th>
             <th>Controlado</th>
@@ -68,7 +95,6 @@
     <tbody>
         {% for item in page_obj %}
         <tr>
-            <td>{{ item.id }}</td>
             <td>{{ item.remedio }}</td>
             <td>{{ item.quantidade }}</td>
             <td>{% if item.controlado %}Sim{% else %}Não{% endif %}</td>
@@ -84,6 +110,25 @@
         {% endfor %}
     </tbody>
 </table>
+
+<!-- Paginação -->
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; Primeira</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+
+        <span class="current">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Próxima</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 
 <!-- Modal Saída Normal -->
 <div id="modalSaida" class="modal">
@@ -155,8 +200,15 @@ function fecharModal(modalId) {
     document.getElementById(modalId).style.display = "none";
 }
 </script>
+<script>
+    document.getElementById("pesquisa").addEventListener("keyup", function() {
+        const termo = this.value.toLowerCase();
+        const linhas = document.querySelectorAll(".styled-table tbody tr");
+    
+        linhas.forEach(function(linha) {
+            const textoLinha = linha.textContent.toLowerCase();
+            linha.style.display = textoLinha.includes(termo) ? "" : "none";
+        });
+    });
+</script>
 {% endblock %}
-
-
-
-
