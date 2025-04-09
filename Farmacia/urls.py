@@ -11,7 +11,7 @@ router.register(r'saida', SaidaEstoqueViewSet, basename='saidaestoque')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home', home, name='home'),
+    path('', home, name='home'),
     path('estoque', estoque_farmacia_lista, name='estoque farmacia'),
     path('listar_saidas', saidas_estoque_lista, name='lista de todas as saidas do mes'),
     path('cadastrar', cadastrar_estoque, name='cadastrar_estoque'),
